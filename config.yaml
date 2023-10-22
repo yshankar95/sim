@@ -1,0 +1,6 @@
+data_base_creds:
+  host: ''
+  port: ''
+  db_name: ''
+  db_username: ''
+  db_password: ''
