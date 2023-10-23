@@ -12,11 +12,6 @@ from flask import Flask, redirect, url_for, session, request, jsonify,render_tem
 
 # conn__ = create_engine(f'postgresql+psycopg2://{username}:{password}@{host}:{str(port)}/{databasename}')
 
-# Host: sdq-prod-1.cbvts3gwaard.us-east-1.rds.amazonaws.com
-# Database: sdq-prod-a7-db
-# User name: readonly
-# Password: Pr0DR3!D@One#
-
 # import requests
 
 app = Flask(__name__)
@@ -38,19 +33,51 @@ oauth.register(
         'scope': 'openid email profile'
     }
 )
+
+
+@app.before_request
+def before_request():
+    if 'google_token' not in session and request.endpoint != 'login':
+        # return index()
+        print('before',request.endpoint)
+        if request.endpoint == 'resp':
+            pass
+        else:
+            return index()
+    else:# 'google_token' in session :
+        print('before1',request.endpoint)
+        if request.endpoint== 'logout' :
+            print('logging out')
+            pass 
+        elif check_authorised(session['user_id'],request):
+            print('authorized')
+            pass
+        else:
+            pass 
+            # print('unauthorized')
+            return unauthorised()
+
 @app.route('/')
 def index():
     if 'google_token' in session:
         # print(session['google_token'])
         name = session['google_token']['userinfo']['name']
         email = session['google_token']['userinfo']['email']
-        data = {'name':name,'email':email}
+        views = get_view(session['user_id'])
+        views = [i for i in views if i not in ['index','logout','login']]
+        print(views)
+        data = {'name':name,'email':email,"view":views}
         return render_template('download.html',data = data)
     return render_template('login.html')
     # if method == 'GET':
     #     print('test')
     # # request
     # return render_template('login.html') #'Login'
+
+@app.route('/unauthorised')
+def unauthorised():
+    return '<h1>Your unauthorised to veiw this page</h1>'
+
 
 @app.route('/login')
 def login():
@@ -66,7 +93,7 @@ def resp():
     print(token)
     id = authen(token['userinfo'])
     session['user_id'] = id
-    print(session)
+    # print(session)
     user = token['userinfo']['name']
     print(" Google User ", user)
     return redirect(url_for('index'))
@@ -77,17 +104,33 @@ def logout():
     session.pop('google_token',None)
     return redirect(url_for('index'))
 
-@app.route('/download_csv')
-def download_csv():
+@app.route('/download_csv/<domain>')
+def download_csv(domain):
     name = session['google_token']['userinfo']['name']
-    df = file()
+    df = download_data(domain)
     return Response(
        df.to_csv(),
        mimetype="text/csv",
        headers={"Content-disposition":
-       f"attachment; filename={name}_file.csv"})
+       f"attachment; filename={name}_{domain}_file.csv"})
     # return send_file('static/files/download.csv',as_attachment=True)
 
+@app.route('/ae')
+def ae():
+    data = data_table('ae')
+    data = '<button><a href="/download_csv/ae">Download CSV</a></button>'+data
+    return str(data)
+@app.route('/cm')
+def cm():
+    data = data_table('cm')
+    data = '<button><a href="/download_csv/ae">Download CSV</a></button>'+data
+    return str(data)
+
+@app.route('/mh')
+def mh():
+    data = data_table('mh')
+    data = '<button><a href="/download_csv/ae">Download CSV</a></button>'+data
+    return str(data)
 
 
 if __name__ =='__main__':

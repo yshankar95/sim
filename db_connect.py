@@ -3,15 +3,16 @@ from sqlalchemy import *
 from sqlalchemy.orm import *
 
 
-host= '192.168.1.11'
+host= '192.168.1.101'
 databasename= 'u0_a208'
 username= 'u0_a208'
 password= 'password'
 port=5432
 
+connection_str= f'postgresql+psycopg2://{username}:{password}@{host}:{str(port)}/{databasename}'
+connection_str_cx= f'postgresql://{username}:{password}@{host}:{str(port)}/{databasename}'
 
-
-con = create_engine(f'postgresql+psycopg2://{username}:{password}@{host}:{str(port)}/{databasename}',pool_size=5,max_overflow=5)
+con = create_engine(connection_str,pool_size=5,max_overflow=5)
 Session = sessionmaker(con)
     
 
