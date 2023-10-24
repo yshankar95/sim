@@ -39,11 +39,13 @@ oauth.register(
 def before_request():
     if 'google_token' not in session and request.endpoint != 'login':
         # return index()
-        print('before',request.endpoint)
+        print('before',request.endpoint,request.full_path)
         if request.endpoint == 'resp':
             pass
         else:
             return index()
+    elif 'google_token' not in session and request.endpoint == 'login':
+        pass
     else:# 'google_token' in session :
         print('before1',request.endpoint)
         if request.endpoint== 'logout' :

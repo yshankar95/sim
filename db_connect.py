@@ -3,10 +3,10 @@ from sqlalchemy import *
 from sqlalchemy.orm import *
 
 
-host= '192.168.1.101'
-databasename= 'u0_a208'
-username= 'u0_a208'
-password= 'password'
+host= 'localhost'
+databasename= 'postgres'
+username= 'postgres'
+password= 'Password'
 port=5432
 
 connection_str= f'postgresql+psycopg2://{username}:{password}@{host}:{str(port)}/{databasename}'

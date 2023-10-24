@@ -8,9 +8,15 @@ import time
 
 def check_authorised(id,request):
     views = get_view(id)
-    print(request.endpoint,request.endpoint in views)
+    print(request.endpoint,request.endpoint in views,request.full_path)
     if request.endpoint in views:
         return True
+    elif request.endpoint == 'download_csv':
+        strr = str(request.full_path).split('/')[-1][0:-1]
+        # print(strr[0:-1],str(request.full_path),str(request.full_path).split('/'))
+        if strr in views:
+            return True
+
     return False
 
 def get_view(id):
