@@ -13,7 +13,7 @@ connection_str= f'postgresql+psycopg2://{username}:{password}@{host}:{str(port)}
 connection_str_cx= f'postgresql://{username}:{password}@{host}:{str(port)}/{databasename}'
 
 con = create_engine(connection_str,pool_size=5,max_overflow=5)
-Session = sessionmaker(con)
+Session = sessionmaker(con,autocommit=False)
     
 
 @contextmanager
