@@ -8,7 +8,7 @@ import time
 
 def check_authorised(id,request):
     views = get_view(id)
-    print(request.endpoint,request.endpoint in views,request.full_path)
+    # print(request.endpoint,request.endpoint in views,request.full_path)
     if request.endpoint in views:
         return True
     elif request.endpoint == 'download_csv':
@@ -25,14 +25,14 @@ def get_view(id):
         result = res.fetchall()
         views = str(result[0][1]).split(',')
         # views = [i for i in views if i not in ['index','logout','login']]
-        print(views)
+        # print(views)
         return views
 
 def check_user(email):
     with conn() as connection:
         res = connection.execute(text(f"select * from mulitenant.users where user_email = '{email}' "))
         result = res.fetchall()
-        print(result)
+        # print(result)
         if len(result)>0:
             return result[0][0],True
         else:
@@ -72,23 +72,30 @@ def data_table(domain):
     # with conn() as connection:
     #     res = connection.execute(text(f"select * from mulitenant.stg_pred where lower(domain) = '{domain}' "))
     #     result = res.fetchall()
-    #     print(result)
-    #     df = pd.DataFrame(result)
-    #     # df = cc.read_sql(conn==connection,query=f"select * from mulitenant.stg_pred where domain = '{domain}' " )
-    #     # df = pd.read_sql(f"select * from mulitenant.stg_pred where domain = '{domain}' ",con=connection )
-    #     # print(df.shape)
-    #     # res = connection.execute(text(f"select * from mulitenant.stg_pred where user_email = '{email}' "))
-    #     # result = res.fetchall()
-    #     return df.to_html()
-def download_data(domain):
-    s = time.time()
-    df = cc.read_sql(connection_str_cx,query=f"select * from mulitenant.stg_pred where lower(domain) = '{domain}' order by ck_event_id" )
-    
-    # with conn() as connection:
-    #     res = connection.execute(text(f"select * from mulitenant.stg_pred where lower(domain) = '{domain}' order by ck_event_id"))
-    #     result = res.fetchall()
     #     # print(result)
     #     df = pd.DataFrame(result)
+        # df = cc.read_sql(conn==connection,query=f"select * from mulitenant.stg_pred where domain = '{domain}' " )
+        # df = pd.read_sql(f"select * from mulitenant.stg_pred where domain = '{domain}' ",con=connection )
+        # print(df.shape)
+        # res = connection.execute(text(f"select * from mulitenant.stg_pred where user_email = '{email}' "))
+        # result = res.fetchall()
+        # return df.to_html()
+def download_data(domain):
+    s = time.time()
+    df = cc.read_sql(connection_str_cx,query=f"select * from mulitenant.stg_pred  order by ck_event_id" ) #where lower(domain) = '{domain}'
+    # convert = 0
+    # with conn() as connection:
+    #     res = connection.execute(text(f"select * from mulitenant.stg_pred order by ck_event_id"))#where lower(domain) = '{domain}'
+    #     result = res.fetchall()
+    #     # print(result)
+    #     ss = time.time()
+    #     df = pd.DataFrame(result)
+    #     ee = time.time()
+    #     convert = (ee-ss)/60
+    #     print('dataframe_convert',ee-ss,convert )
+
     e=time.time()
-    print(e-s, (e-s)/60)
+    total = (e-s)/60
+    print(e-s, total)
+    # print('DB fetch time', total - convert)
     return df

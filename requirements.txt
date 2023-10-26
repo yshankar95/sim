@@ -19,6 +19,7 @@ numpy==1.26.1
 pandas==2.1.1
 psycopg2-binary==2.9.9
 pyaml==23.9.7
+gunicorn==21.2.0
 pycparser==2.21
 python-dateutil==2.8.2
 pytz==2023.3.post1

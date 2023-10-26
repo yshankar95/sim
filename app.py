@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy import *
 from operation import *
 from flask import Flask, redirect, url_for, session, request, jsonify,render_template,send_file,Response
-
+# from flask_sqlalchemy import SQLAlchemy
 
 # create_pool_from_url()
 # print(session)
@@ -15,6 +15,9 @@ from flask import Flask, redirect, url_for, session, request, jsonify,render_tem
 # import requests
 
 app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:Password@localhost:5432/postgres'
+# db = SQLAlchemy(app)
+
 app.secret_key = 'test'
 client_id = '568987694416-q421d6q05trqnrd32rdnd1smve27vdde.apps.googleusercontent.com'
 client_secret = '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'
@@ -39,7 +42,7 @@ oauth.register(
 def before_request():
     if 'google_token' not in session and request.endpoint != 'login':
         # return index()
-        print('before',request.endpoint,request.full_path)
+        # print('before',request.endpoint,request.full_path)
         if request.endpoint == 'resp':
             pass
         else:
@@ -47,12 +50,12 @@ def before_request():
     elif 'google_token' not in session and request.endpoint == 'login':
         pass
     else:# 'google_token' in session :
-        print('before1',request.endpoint)
+        # print('before1',request.endpoint)
         if request.endpoint== 'logout' :
-            print('logging out')
+            # print('logging out')
             pass 
         elif check_authorised(session['user_id'],request):
-            print('authorized')
+            # print('authorized')
             pass
         else:
             pass 
@@ -67,7 +70,7 @@ def index():
         email = session['google_token']['userinfo']['email']
         views = get_view(session['user_id'])
         views = [i for i in views if i not in ['index','logout','login']]
-        print(views)
+        # print(views)
         data = {'name':name,'email':email,"view":views}
         return render_template('download.html',data = data)
     return render_template('login.html')
@@ -84,7 +87,7 @@ def unauthorised():
 @app.route('/login')
 def login():
     redirect_uri = url_for('resp', _external=True)
-    print(redirect_uri)
+    # print(redirect_uri)
     return oauth.google.authorize_redirect(redirect_uri)
     return google.authorize(callback=url_for('resp', _external=True))
 
@@ -92,12 +95,12 @@ def login():
 def resp():
     token = oauth.google.authorize_access_token()
     session['google_token'] = token
-    print(token)
+    # print(token)
     id = authen(token['userinfo'])
     session['user_id'] = id
     # print(session)
     user = token['userinfo']['name']
-    print(" Google User ", user)
+    # print(" Google User ", user)
     return redirect(url_for('index'))
 
 @app.route('/logout')
@@ -125,15 +128,15 @@ def ae():
 @app.route('/cm')
 def cm():
     data = data_table('cm')
-    data = '<button><a href="/download_csv/ae">Download CSV</a></button>'+data
+    data = '<button><a href="/download_csv/cm">Download CSV</a></button>'+data
     return str(data)
 
-@app.route('/mh')
-def mh():
-    data = data_table('mh')
-    data = '<button><a href="/download_csv/ae">Download CSV</a></button>'+data
+@app.route('/lb')
+def lb():
+    data = data_table('lb')
+    data = '<button><a href="/download_csv/lb">Download CSV</a></button>'+data
     return str(data)
 
 
 if __name__ =='__main__':
-    app.run(host='0.0.0.0',port=5001)
+    app.run(host='0.0.0.0',port=5001,threaded=True)
