@@ -65,7 +65,7 @@ def before_request():
 @app.route('/')
 def index():
     if 'google_token' in session:
-        # print(session['google_token'])
+        print(session['google_token'])
         name = session['google_token']['userinfo']['name']
         email = session['google_token']['userinfo']['email']
         views = get_view(session['user_id'])
@@ -94,7 +94,8 @@ def login():
 @app.route('/login/resp')
 def resp():
     token = oauth.google.authorize_access_token()
-    session['google_token'] = token
+    session['google_token']={}
+    session['google_token'].update({'userinfo': token['userinfo']})
     # print(token)
     id = authen(token['userinfo'])
     session['user_id'] = id
